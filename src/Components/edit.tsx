@@ -1,31 +1,45 @@
 
-import React from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 
+import 'quill/dist/quill.snow.css';
+import { useEffect, useRef, } from 'react';
+import ReactQuill from 'react-quill';
 
-interface IData {
-    filterData: [{
-        id: string,
-        subject: string,
-        body: string
-    }],
-    setOpen: boolean,
+export type IfilterData = {
+    id: string,
+    subject: string,
+    body: string
+    view_href: string,
+    conversation: {
+        last_post_time: string
+    }
+    author: {
+        login: string
+    }
 }
 
-// const data: IData = {
-//     ID: "24567",
-//     Subject: "Quantum Mechanics Exploration",
-//     Body: "Greetings explorers! In our quest to unravel the mysteries of the quantum realm, let's delve into the mind-bending world of superposition and entanglement. Buckle up for a journey where particles can exist in multiple states simultaneously, and actions on one can instantaneously affect another, regardless of distance. Share your thoughts and theories as we navigate this perplexing yet fascinating domain",
-// };
+interface IData {
+    filterData: IfilterData[],
+    setOpen: (open: boolean) => any;
+}
 
 export const Editor = ({ filterData, setOpen }: IData) => {
 
+    const quillRef = useRef(null);
+    useEffect(() => {
+        if (quillRef.current) {
+            const quill = quillRef.current.getEditor();
+            const htmlContent = filterData[0].body;
+            quill.format('size', 'normal')
+            const delta = quill.clipboard.convert(htmlContent); // Convert HTML to Delta
+            quill.setContents(delta); // Set Delta as editor content
+        }
+    }, [quillRef]);
 
     const { handleSubmit, control } = useForm();
+    // console.log("filterData",filterData[0].body)
 
-
-    const onSubmit = (formData: IData) => {
-
+    const onSubmit: SubmitHandler<IfilterData> = (formData) => {
 
         console.log('Form data:', formData);
     };
@@ -35,17 +49,15 @@ export const Editor = ({ filterData, setOpen }: IData) => {
     }
 
     return (
-        <div className='p-9' > 
-
-            <h1 className='text-center font-semibold '>Khoros Data Editer</h1>
-        <div className='justify-start flex p-2' onClick={cancelButton}>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /> 
-            </svg>
-            <p className='pl-2'>Home</p>
-        </div>
+        <div className='p-9' >
+            <div className='justify-start flex p-2' onClick={cancelButton}>
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                <p className='pl-2'>Home</p>
+            </div>
             <div className="container mx-auto max-w-7xl px-4 min-h-screen justify-around grid h-full gap-14 grid-flow-col grid-cols-2">
-                
+
                 {filterData.map((items) => (
                     <>
 
@@ -60,7 +72,7 @@ export const Editor = ({ filterData, setOpen }: IData) => {
                             </div>
                         </div>
                         {/* Editable Preview */}
-                        <div className='w-full  '>
+                        <div className='w-full'>
                             <form onSubmit={handleSubmit(onSubmit)} className='bg-white p-4 rounded-md shadow-md'>
                                 <div className='mb-4'>
                                     <label htmlFor="subject" className='block text-sm font-semibold text-gray-600'>Subject:</label>
@@ -78,27 +90,34 @@ export const Editor = ({ filterData, setOpen }: IData) => {
                                             />
                                         )}
                                     />
+                                    {/* <div ref={quillRef} */}
                                 </div>
                                 <div className='mb-4'>
                                     <label htmlFor="body" className='block text-sm font-semibold text-gray-600'>Body:</label>
                                     <Controller
                                         name="body"
                                         control={control}
-                                        defaultValue={items.body}
+                                        defaultValue="fdojoidjf"// Set default value to empty string
                                         render={({ field }) => (
-                                            <textarea
-                                                onChange={(e) => field.onChange(e.target.value)}
-                                                value={field.value}
-                                                className='w-full min-h-52 px-3 py-2 text-xs border border-slate-300 rounded-md focus:outline-none focus:border-blue-500'
+                                            <ReactQuill
+                                                ref={quillRef}
+                                                className='w-full h-full px-3 py-2 text-sm font-normal border border-slate-300 rounded-md focus:outline-none focus:border-blue-500'
+                                                onChange={(content, delta, source, editor) => {
+                                                    const textContent = editor.getText();
+                                                    field.onChange(textContent);
+                                                }} // Update form value with Quill data
+                                                theme="snow"
                                                 placeholder="Enter body"
+
                                             />
                                         )}
                                     />
+
                                 </div>
                                 <div className='space-x-4'>
 
                                     <button type="submit" className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300'>
-                                        update
+                                        Publish
                                     </button>
                                     <button type="submit" onClick={cancelButton} className='bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:border-blue-300'>
                                         Back
