@@ -48,6 +48,14 @@ export const Editor = ({ filterData, setOpen }: IData) => {
         setOpen(false)
     }
 
+    const modules = {
+        toolbar: [
+            ['bold', 'italic', 'underline', 'strike'],
+            ['link', 'image', 'video'],
+            ['clean']
+        ]
+    }
+
     return (
         <div className='p-9' >
             <div className='justify-start flex p-2' onClick={cancelButton}>
@@ -97,10 +105,11 @@ export const Editor = ({ filterData, setOpen }: IData) => {
                                     <Controller
                                         name="body"
                                         control={control}
-                                        defaultValue="fdojoidjf"// Set default value to empty string
+                                        // defaultValue=""// Set default value to empty string
                                         render={({ field }) => (
                                             <ReactQuill
                                                 ref={quillRef}
+                                                modules={modules}
                                                 className='w-full h-full px-3 py-2 text-sm font-normal border border-slate-300 rounded-md focus:outline-none focus:border-blue-500'
                                                 onChange={(content, delta, source, editor) => {
                                                     const textContent = editor.getText();

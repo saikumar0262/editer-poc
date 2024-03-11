@@ -16,7 +16,7 @@ export const Home = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const response = await fetch("https://italent2.demo.lithium.com/api/2.0/search?q= select id,subject, body,author.login,conversation.last_post_time from messages where is_solution=true");
+            const response = await fetch("https://italent2.demo.lithium.com/api/2.0/search?q= select id,subject, body,author.login,conversation.last_post_time from messages where depth=0");
             const jsonData = await response.json();
             setData(jsonData.data.items)
         }
