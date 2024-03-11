@@ -2,7 +2,7 @@
 import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 
 import 'quill/dist/quill.snow.css';
-import { useEffect, useRef, } from 'react';
+import { useEffect, useRef, useState, } from 'react';
 import ReactQuill from 'react-quill';
 
 export type IfilterData = {
@@ -15,6 +15,7 @@ export type IfilterData = {
     }
     author: {
         login: string
+        id:string
     }
 }
 
@@ -24,7 +25,6 @@ interface IData {
 }
 
 export const Editor = ({ filterData, setOpen }: IData) => {
-
     const quillRef = useRef(null);
     useEffect(() => {
         if (quillRef.current) {
@@ -49,12 +49,17 @@ export const Editor = ({ filterData, setOpen }: IData) => {
     }
 
     const modules = {
-        toolbar: [
-            ['bold', 'italic', 'underline', 'strike'],
-            ['link', 'image', 'video'],
-            ['clean']
-        ]
+        toolbar: {
+            container: [
+              
+              ['bold', 'italic', 'underline', 'strike'],
+              ['link'],
+              ['clean']
+            ],
+          }
     }
+
+    
 
     return (
         <div className='p-9' >
