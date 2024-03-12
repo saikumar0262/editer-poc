@@ -13,6 +13,7 @@ export const Home = () => {
     const [filterData, setFilterData] = useState<IfilterData[]>([])
     const [open, setOpen] = useState<boolean>(false)
     const [avatar,setAvatar] =useState<IfilterData[]>([])
+    const [err,setErr]= useState<boolean>(false)
 
     // const history = useHistory();
 
@@ -21,7 +22,7 @@ export const Home = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch("https://italent2.demo.lithium.com/api/2.0/search?q=SELECT id, subject, author,conversation FROM messages where depth=0");
+                const response = await fetch("https://italent2.demo.lithium.com/api/2.0/search?q=SELECT id,body, subject, author,conversation FROM messages where depth=0");
                 const jsonData = await response.json();
                 setData(jsonData.data.items);
             } catch (error) {
@@ -60,6 +61,13 @@ export const Home = () => {
 
     const buttonhandle = (id: string) => {
         const filtered = data.filter(item => item.id === id);
+        const subfilter = data.filter(item => item.subject.startsWith("Re:"));
+        console.log("subfilte>>>>r",subfilter)
+        if(subfilter.length!==0){
+            setErr(true)
+        }else{
+            setErr(false)
+        }
         setFilterData(filtered)
         setOpen(true)
     }
@@ -109,7 +117,7 @@ export const Home = () => {
                 </div>
             )}
             {open === true && <div>
-                <Editor filterData={filterData} setOpen={setOpen} />
+                <Editor filterData={filterData} setOpen={setOpen} err= {err} />
             </div>
 
             }
